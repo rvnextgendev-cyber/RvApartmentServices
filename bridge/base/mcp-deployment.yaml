@@ -1,0 +1,46 @@
+#! mcp-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: mcp
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: mcp
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: apartmentapp
+            com.docker.compose.service: mcp
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: apartmentapp
+                com.docker.compose.service: mcp
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: maint-mcp
+                  image: apartmentapp-mcp
+                  imagePullPolicy: IfNotPresent
+                  args:
+                    - python
+                    - mcp_server.py
+                  env:
+                    - name: AUDIT_URL
+                      value: "http://audit-service:8003"
+                    - name: LLM_MODEL
+                      value: "llama3"
+                    - name: LLM_URL
+                      value: "http://llm:11434"
+                    - name: PAYMENTS_URL
+                      value: "http://payments-service:8001"
+                    - name: WHATSAPP_URL
+                      value: "http://whatsapp-service:8002"
+                  ports:
+                    - name: mcp-8000
+                      containerPort: 8000

@@ -52,6 +52,7 @@ MCP server:
 
 ## Architecture
 
+```mermaid
 graph TD
     UI[Streamlit UI (app 8501)] -->|HTTP tools| PAY[payments-service]
     UI --> WA[whatsapp-service]
@@ -150,7 +151,7 @@ LLM_MODEL=llama3
 
 ## Typical Prompts
 
-- "Add flat D-404 for Jane Doe, phone +911234567890."
+- "Add flat D-404 for Rajesh Kumar Das, phone +911234567890."
 - "Has B-302 paid for 2025-12?"
 - "Check if C-101 has paid this month; if not, send WhatsApp."
 - "Add flat E-202, owner John Smith, WhatsApp +910000000123."

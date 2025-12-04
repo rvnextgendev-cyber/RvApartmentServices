@@ -1,0 +1,39 @@
+#! llm-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: llm
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: llm
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: apartmentapp
+            com.docker.compose.service: llm
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: apartmentapp
+                com.docker.compose.service: llm
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: maint-llm
+                  image: apartmentapp-llm
+                  imagePullPolicy: IfNotPresent
+                  args:
+                    - uvicorn
+                    - services.llm_mock:app
+                    - --host
+                    - 0.0.0.0
+                    - --port
+                    - 11434
+                  ports:
+                    - name: llm-8000
+                      containerPort: 8000

@@ -1,0 +1,18 @@
+#! audit-service-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: audit-service
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: audit-service
+spec:
+    selector:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: audit-service
+    ports:
+        - name: audit-serv-8000
+          port: 8000
+          targetPort: audit-serv-8000

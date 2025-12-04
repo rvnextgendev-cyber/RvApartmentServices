@@ -1,0 +1,48 @@
+#! payments-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: payments-service
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: payments-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: apartmentapp
+            com.docker.compose.service: payments-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: apartmentapp
+                com.docker.compose.service: payments-service
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: payments-service
+                  image: apartmentapp-payments-service
+                  imagePullPolicy: IfNotPresent
+                  args:
+                    - uvicorn
+                    - services.payments_service:app
+                    - --host
+                    - 0.0.0.0
+                    - --port
+                    - 8001
+                  env:
+                    - name: POSTGRES_DB
+                      value: "maintdb"
+                    - name: POSTGRES_HOST
+                      value: "db"
+                    - name: POSTGRES_PASSWORD
+                      value: "maintpass"
+                    - name: POSTGRES_USER
+                      value: "maintuser"
+                  ports:
+                    - name: payments-s-8000
+                      containerPort: 8000

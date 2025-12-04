@@ -1,0 +1,18 @@
+#! whatsapp-service-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: whatsapp-service
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: whatsapp-service
+spec:
+    selector:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: whatsapp-service
+    ports:
+        - name: whatsapp-s-8000
+          port: 8000
+          targetPort: whatsapp-s-8000

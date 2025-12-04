@@ -1,0 +1,18 @@
+#! payments-service-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: payments-service
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: payments-service
+spec:
+    selector:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: payments-service
+    ports:
+        - name: payments-s-8000
+          port: 8000
+          targetPort: payments-s-8000

@@ -1,0 +1,24 @@
+#! kustomization.yaml
+# Generated code, do not edit
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+    - 0-apartmentapp-namespace.yaml
+    - app-deployment.yaml
+    - app-expose.yaml
+    - app-service.yaml
+    - audit-service-deployment.yaml
+    - audit-service-expose.yaml
+    - db-C:\Apartment prototype\ApartmentApp\db\init.sql-persistentVolumeClaim.yaml
+    - db-deployment.yaml
+    - db-expose.yaml
+    - db-service.yaml
+    - default-network-policy.yaml
+    - llm-deployment.yaml
+    - llm-expose.yaml
+    - mcp-deployment.yaml
+    - mcp-expose.yaml
+    - payments-service-deployment.yaml
+    - payments-service-expose.yaml
+    - whatsapp-service-deployment.yaml
+    - whatsapp-service-expose.yaml

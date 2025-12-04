@@ -1,0 +1,51 @@
+#! app-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: app
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: app
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: apartmentapp
+            com.docker.compose.service: app
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: apartmentapp
+                com.docker.compose.service: app
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: maint-app
+                  image: apartmentapp-app
+                  imagePullPolicy: IfNotPresent
+                  args:
+                    - streamlit
+                    - run
+                    - app/streamlit_app.py
+                    - --server.port=8501
+                    - --server.address=0.0.0.0
+                  env:
+                    - name: AUDIT_URL
+                      value: "http://audit-service:8003"
+                    - name: LLM_MODEL
+                      value: "llama3"
+                    - name: LLM_URL
+                      value: "http://llm:11434"
+                    - name: PAYMENTS_URL
+                      value: "http://payments-service:8001"
+                    - name: WHATSAPP_URL
+                      value: "http://whatsapp-service:8002"
+                  ports:
+                    - name: app-8000
+                      containerPort: 8000
+                    - name: app-8501
+                      containerPort: 8501

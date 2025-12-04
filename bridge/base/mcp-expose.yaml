@@ -1,0 +1,18 @@
+#! mcp-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: mcp
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: mcp
+spec:
+    selector:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: mcp
+    ports:
+        - name: mcp-8000
+          port: 8000
+          targetPort: mcp-8000

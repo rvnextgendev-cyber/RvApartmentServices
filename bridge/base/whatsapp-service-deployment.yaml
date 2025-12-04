@@ -1,0 +1,39 @@
+#! whatsapp-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: whatsapp-service
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: whatsapp-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: apartmentapp
+            com.docker.compose.service: whatsapp-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: apartmentapp
+                com.docker.compose.service: whatsapp-service
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: whatsapp-service
+                  image: apartmentapp-whatsapp-service
+                  imagePullPolicy: IfNotPresent
+                  args:
+                    - uvicorn
+                    - services.whatsapp_service:app
+                    - --host
+                    - 0.0.0.0
+                    - --port
+                    - 8002
+                  ports:
+                    - name: whatsapp-s-8000
+                      containerPort: 8000

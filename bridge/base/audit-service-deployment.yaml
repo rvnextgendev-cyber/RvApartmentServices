@@ -1,0 +1,48 @@
+#! audit-service-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: audit-service
+    namespace: apartmentapp
+    labels:
+        com.docker.compose.project: apartmentapp
+        com.docker.compose.service: audit-service
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: apartmentapp
+            com.docker.compose.service: audit-service
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: apartmentapp
+                com.docker.compose.service: audit-service
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: audit-service
+                  image: apartmentapp-audit-service
+                  imagePullPolicy: IfNotPresent
+                  args:
+                    - uvicorn
+                    - services.audit_service:app
+                    - --host
+                    - 0.0.0.0
+                    - --port
+                    - 8003
+                  env:
+                    - name: POSTGRES_DB
+                      value: "maintdb"
+                    - name: POSTGRES_HOST
+                      value: "db"
+                    - name: POSTGRES_PASSWORD
+                      value: "maintpass"
+                    - name: POSTGRES_USER
+                      value: "maintuser"
+                  ports:
+                    - name: audit-serv-8000
+                      containerPort: 8000

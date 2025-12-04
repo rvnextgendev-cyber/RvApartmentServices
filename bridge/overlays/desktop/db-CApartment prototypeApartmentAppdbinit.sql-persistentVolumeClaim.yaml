@@ -1,0 +1,9 @@
+#! db-C:\Apartment prototype\ApartmentApp\db\init.sql-persistentVolumeClaim.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: db-c--apartment-prototype-apartmentapp-db-init-sql
+    namespace: apartmentapp
+spec:
+    storageClassName: "hostpath" # see docker/desktop-storage-provisioner
