@@ -18,6 +18,7 @@ Open http://localhost:8501 to use the UI.
 - `audit-service`: FastAPI to log actions to Postgres.
 - `llm`: Mock FastAPI LLM that returns plans/explanations shaped like an Ollama chat response.
 - `db`: Postgres seeded from `db/init.sql`.
+- `mcp`: MCP server exposing the same tools (payments, flats, reminders, audit, LLM pass-through) for MCP-compatible clients.
 
 Environment defaults live in `.env` (used by the Streamlit container).
 
@@ -44,6 +45,85 @@ Audit service:
 
 LLM mock:
 - `POST /api/chat` → returns a human-readable message; in planner mode it includes the plan JSON in-line so the UI can still parse it.
+
+MCP server:
+- Tools: `get_payment_status`, `add_flat`, `list_flats`, `send_whatsapp_reminder`, `log_event`, `check_and_remind`, `llm_chat`.
+- Runs via `python mcp_server.py` (also included in docker-compose as service `mcp`).
+
+## Architecture
+
+```mermaid
+flowchart TB
+    UI[Streamlit UI (app:8501)] -->|HTTP tools| PAY[payments-service]
+    UI --> WA[whatsapp-service]
+    UI --> AU[audit-service]
+    UI --> LLM[llm mock /api/chat]
+
+    PAY <---> DB[(Postgres)]
+    AU <---> DB
+
+    UI --> MCP[mcp server (fastmcp tools)]
+    MCP --> PAY
+    MCP --> WA
+    MCP --> AU
+    MCP --> LLM
+
+    subgraph Compose
+      UI
+      PAY
+      WA
+      AU
+      LLM
+      MCP
+      DB
+    end
+```
+
+```
+                    +---------------------------+
+                    |        Streamlit UI       |
+                    |        (app:8501)         |
+                    +-------------+-------------+
+                                  |
+                                  | HTTP (tool calls)
+                                  v
++------------------+     +------------------+     +-----------------+
+| payments-service |     | whatsapp-service|     |  audit-service  |
+|  /get_payment... |     |  /send_reminder |     |   /log_event    |
+|  /add_flat       |     +-----------------+     +-----------------+
+|  /list_flats     |               |                     |
++---------+--------+               |                     |
+          |                        |                     |
+          |                        |                     |
+          v                        v                     v
+     +-------------------------------------------------------+
+     |                       Postgres                        |
+     | flats, maintenance_payments, audit_logs               |
+     +-------------------------------------------------------+
+
+                    +---------------------------+
+                    |         llm (mock)        |
+                    |       /api/chat           |
+                    +-------------+-------------+
+                                  ^
+                                  | used for planner/explainer
+
+                    +---------------------------+
+                    |          mcp             |
+                    |  exposes tools:          |
+                    |   - get_payment_status   |
+                    |   - add_flat, list_flats |
+                    |   - send_whatsapp_reminder|
+                    |   - log_event            |
+                    |   - llm_chat             |
+                    +---------------------------+
+
+Legend:
+- All services run via `docker compose up --build`.
+- UI calls payments/whatsapp/audit directly; asks LLM for plan/explanation.
+- MCP server exposes the same toolset for MCP-compatible clients.
+- Postgres stores flats, payments, audit logs.
+```
 
 ## Agent Workflow (UI)
 

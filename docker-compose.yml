@@ -47,6 +47,23 @@ services:
     container_name: maint-llm
     command: ["uvicorn", "services.llm_mock:app", "--host", "0.0.0.0", "--port", "11434"]
 
+  mcp:
+    build: .
+    container_name: maint-mcp
+    command: ["python", "mcp_server.py"]
+    env_file:
+      - .env
+    environment:
+      PAYMENTS_URL: http://payments-service:8001
+      WHATSAPP_URL: http://whatsapp-service:8002
+      AUDIT_URL: http://audit-service:8003
+      LLM_URL: http://llm:11434
+      LLM_MODEL: llama3
+    depends_on:
+      - payments-service
+      - whatsapp-service
+      - audit-service
+      - llm
   app:
     build: .
     container_name: maint-app
