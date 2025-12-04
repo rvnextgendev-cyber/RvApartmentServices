@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: maint-db
+    environment:
+      POSTGRES_DB: maintdb
+      POSTGRES_USER: maintuser
+      POSTGRES_PASSWORD: maintpass
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+
+  payments-service:
+    build: .
+    container_name: payments-service
+    command: ["uvicorn", "services.payments_service:app", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      POSTGRES_DB: maintdb
+      POSTGRES_USER: maintuser
+      POSTGRES_PASSWORD: maintpass
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+
+  whatsapp-service:
+    build: .
+    container_name: whatsapp-service
+    command: ["uvicorn", "services.whatsapp_service:app", "--host", "0.0.0.0", "--port", "8002"]
+
+  audit-service:
+    build: .
+    container_name: audit-service
+    command: ["uvicorn", "services.audit_service:app", "--host", "0.0.0.0", "--port", "8003"]
+    environment:
+      POSTGRES_DB: maintdb
+      POSTGRES_USER: maintuser
+      POSTGRES_PASSWORD: maintpass
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+
+  llm:
+    build: .
+    container_name: maint-llm
+    command: ["uvicorn", "services.llm_mock:app", "--host", "0.0.0.0", "--port", "11434"]
+
+  app:
+    build: .
+    container_name: maint-app
+    command: ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    env_file:
+      - .env
+    environment:
+      PAYMENTS_URL: http://payments-service:8001
+      WHATSAPP_URL: http://whatsapp-service:8002
+      AUDIT_URL: http://audit-service:8003
+      LLM_URL: http://llm:11434
+      LLM_MODEL: llama3
+    ports:
+      - "8501:8501"
+    depends_on:
+      - payments-service
+      - whatsapp-service
+      - audit-service
+      - llm
