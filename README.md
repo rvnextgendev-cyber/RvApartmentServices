@@ -52,7 +52,6 @@ MCP server:
 
 ## Architecture
 
-```mermaid
 graph TD
     UI[Streamlit UI (app 8501)] -->|HTTP tools| PAY[payments-service]
     UI --> WA[whatsapp-service]
