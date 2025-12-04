@@ -53,16 +53,16 @@ MCP server:
 ## Architecture
 
 ```mermaid
-flowchart TB
-    UI[Streamlit UI (app:8501)] -->|HTTP tools| PAY[payments-service]
+graph TD
+    UI[Streamlit UI (app 8501)] -->|HTTP tools| PAY[payments-service]
     UI --> WA[whatsapp-service]
     UI --> AU[audit-service]
     UI --> LLM[llm mock /api/chat]
+    UI --> MCP[mcp server (MCP tools)]
 
-    PAY <---> DB[(Postgres)]
-    AU <---> DB
+    PAY <-->|SQL| DB[(Postgres)]
+    AU <-->|SQL| DB
 
-    UI --> MCP[mcp server (fastmcp tools)]
     MCP --> PAY
     MCP --> WA
     MCP --> AU
