@@ -15,17 +15,6 @@ LLM_URL = os.getenv("LLM_URL", "http://llm:11434")
 LLM_MODEL = os.getenv("LLM_MODEL", "llama3")
 
 
-def _safe_rerun():
-    """Rerun the app in a Streamlit-version-safe way."""
-    if hasattr(st, "rerun"):
-        st.rerun()
-    elif hasattr(st, "experimental_rerun"):
-        st.experimental_rerun()
-    else:
-        # Fallback: rely on Streamlit's auto-rerun by touching session_state
-        st.session_state["_trigger_rerun"] = not st.session_state.get("_trigger_rerun", False)
-
-
 def llm_chat(system_prompt: str, user_prompt: str) -> str:
     """Call local Llama (Ollama-compatible) chat endpoint and return assistant text."""
     resp = requests.post(
@@ -216,12 +205,12 @@ with col_s1:
         key="suggested_prompt",
     )
 with col_s2:
-    st.caption("Select a suggestion to populate the box.")
-
-# if a suggestion was chosen, push it into the textbox before it renders
-if suggested and suggested != st.session_state.get("user_input"):
-    st.session_state["user_input"] = suggested
-    _safe_rerun()
+    if st.button("Use suggestion"):
+        if suggested:
+            st.session_state["user_input"] = suggested
+        st.caption("Select a suggestion to populate the box.")
+    else:
+        st.caption("Select a suggestion to populate the box.")
 
 user_input = st.text_input("Your message:", key="user_input")
 
